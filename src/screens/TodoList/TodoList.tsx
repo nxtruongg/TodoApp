@@ -3,7 +3,7 @@ import {
   BottomSheetModal,
   BottomSheetView,
 } from '@gorhom/bottom-sheet';
-import React, {useCallback, useRef, useState} from 'react';
+import React, {useCallback, useMemo, useRef, useState} from 'react';
 import {
   Alert,
   Dimensions,
@@ -56,6 +56,7 @@ const TodoList = () => {
   const [name, setName] = useState<string>('');
 
   const priorityValues = Object.values(EPriority);
+  const snapPoints = useMemo(() => ['50%'], []);
 
   const reset = useCallback(() => {
     setDate(new Date());
@@ -192,10 +193,16 @@ const TodoList = () => {
         onCancel={() => setShowDateTimePicker(false)}
       />
 
-      <BottomSheetModal ref={bottomSheetRef} backdropComponent={renderBackdrop}>
+      <BottomSheetModal
+        snapPoints={snapPoints}
+        ref={bottomSheetRef}
+        keyboardBehavior="interactive"
+        enableDynamicSizing={false}
+        backdropComponent={renderBackdrop}>
         <BottomSheetView style={styles.bottomSheetContainer}>
           <FlatList
             ref={tabFlatListRef}
+            showsHorizontalScrollIndicator={false}
             data={tabs}
             keyExtractor={item => item.key}
             horizontal
