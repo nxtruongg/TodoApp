@@ -1,11 +1,29 @@
 import {Config} from '@/theme';
-import React from 'react';
-import {StyleSheet, TouchableOpacity} from 'react-native';
+import React, {useState} from 'react';
+import {StyleSheet, TouchableOpacity, View} from 'react-native';
 
-const Checkbox = () => {
+interface CheckboxProps {
+  checked?: boolean;
+  onToggle?: (checked: boolean) => void;
+}
+
+const Checkbox = ({checked = false, onToggle}: CheckboxProps) => {
+  const [isChecked, setIsChecked] = useState<boolean>(checked);
+
+  const toggleCheckbox = () => {
+    const newCheckedState = !isChecked;
+    setIsChecked(newCheckedState);
+    if (onToggle) {
+      onToggle(newCheckedState);
+    }
+  };
+
   return (
-    <TouchableOpacity style={styles.container}>
-      <></>
+    <TouchableOpacity
+      style={[styles.container, isChecked && styles.checkedContainer]}
+      onPress={toggleCheckbox}
+      activeOpacity={0.8}>
+      {isChecked && <View style={styles.checkMark} />}
     </TouchableOpacity>
   );
 };
@@ -17,6 +35,15 @@ const styles = StyleSheet.create({
     width: 22,
     height: 22,
     borderRadius: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
     backgroundColor: Config.lightGray,
+  },
+  checkedContainer: {},
+  checkMark: {
+    width: 10,
+    height: 10,
+    backgroundColor: Config.green,
+    borderRadius: 2,
   },
 });
