@@ -1,5 +1,28 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
-import {Todo, TodoState} from './interface';
+import {EPriority, Todo, TodoState} from './interface';
+
+const priorityOrder: Record<EPriority, number> = {
+  [EPriority.High]: 1,
+  [EPriority.Medium]: 2,
+  [EPriority.Low]: 3,
+};
+
+const sortTodos = (todos: Todo[]): Todo[] => {
+  return [...todos].sort((a, b) => {
+    if (a.completed !== b.completed) {
+      return a.completed ? 1 : -1;
+    }
+    if (!a.completed && !b.completed) {
+      return priorityOrder[a.priority] - priorityOrder[b.priority];
+    }
+    if (a.completed && b.completed) {
+      return (
+        new Date(b.date_updated).getTime() - new Date(a.date_updated).getTime()
+      );
+    }
+    return 0;
+  });
+};
 
 const initialState: TodoState = {
   todos: [],
@@ -11,7 +34,7 @@ const todoSlice = createSlice({
   reducers: {
     addTodo: (state, action: PayloadAction<Todo>) => {
       state.todos.push(action.payload);
-      state.todos.sort((a, b) => b.priority.localeCompare(a.priority));
+      state.todos = sortTodos(state.todos);
     },
     updateTodo: (state, action: PayloadAction<Todo>) => {
       const index = state.todos.findIndex(
@@ -19,6 +42,7 @@ const todoSlice = createSlice({
       );
       if (index !== -1) {
         state.todos[index] = action.payload;
+        state.todos = sortTodos(state.todos);
       }
     },
     deleteTodo: (state, action: PayloadAction<string>) => {
